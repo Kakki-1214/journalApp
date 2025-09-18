@@ -47,4 +47,5 @@ jobs:
           IAP_TEST_MODE: '1'
           TEST_AUTH_LIMIT: '9999'
           WEBHOOK_SHARED_SECRET: 'ci-shared'
+          DB_FILE: 'data.sqlite'
         run: npm test --silent
