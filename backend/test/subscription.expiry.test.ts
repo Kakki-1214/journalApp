@@ -12,6 +12,7 @@ describe('Subscription expiry sweep', () => {
   it('marks active subscription expired after time passes & sweep runs', async () => {
     const email = `sweep_${Date.now()}@ex.com`;
     const reg = await request(app).post('/auth/email/register').send({ email, password:'pw123456'});
+    expect(reg.status).toBe(200);
     const token = reg.body.data.token;
 
     // Create short future subscription (future:500ms to reduce timing flake)

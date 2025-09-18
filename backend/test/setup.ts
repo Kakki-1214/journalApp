@@ -1,14 +1,19 @@
 import { beforeAll, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
+import { randomUUID } from 'crypto';
 
 // Force SQLite provider for tests (keep runExpirySweep deterministic)
 process.env.TEST_FORCE_SQLITE = '1';
+// Ensure test env for bcrypt rounds and other test-time conditions
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'test';
 
 // Use isolated sqlite file per test run
 const tmpDir = path.join(process.cwd(), '.tmp-test');
 if(!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
-const dbFile = path.join(tmpDir, `test-${Date.now()}.sqlite`);
+// Use a per-worker, per-process unique sqlite file to avoid cross-test interference in parallel CI
+const workerId = process.env.VITEST_WORKER_ID || 'w';
+const dbFile = path.join(tmpDir, `test-${workerId}-${randomUUID()}.sqlite`);
 process.env.DB_FILE = dbFile;
 // Provide required env secrets placeholders
 process.env.JWT_SECRET = 'test-secret-0123456789-entropy-demo';
