@@ -1,0 +1,5 @@
+services:
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/${GH_OWNER}/${GH_REPO}-backend:latest}
+    build: null
+    # 注: compose v2では null/空指定で build を無効化

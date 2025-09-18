@@ -1,0 +1,44 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [20.x]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint || echo "Lint warnings"
+      - name: Build
+        run: npm run build
+      - name: Test
+        env:
+          TEST_FORCE_SQLITE: '1'
+          JWT_SECRET: 'ci-secret-ci-secret-ci-secret-ci-secret'
+          APPLE_SHARED_SECRET: 'ci-apple-secret'
+          GOOGLE_SA_EMAIL: 'ci@example.com'
+          GOOGLE_SA_KEY: '-----BEGIN PRIVATE KEY-----\nMIIB...test\n-----END PRIVATE KEY-----\n'
+          IAP_TEST_MODE: '1'
+          TEST_AUTH_LIMIT: '9999'
+          WEBHOOK_SHARED_SECRET: 'ci-shared'
+        run: npm test --silent
